@@ -10,7 +10,7 @@
 
 **Live demo:** <https://robot-realtime-mointor.onrender.com>
 
-> Render free services can take a short time to wake up on the first visit. Open the demo shortly before an interview.
+> Render free-tier services may take ~30 seconds to wake up on the first visit.
 
 ## Project Overview
 
