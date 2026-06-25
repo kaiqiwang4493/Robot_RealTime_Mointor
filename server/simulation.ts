@@ -165,6 +165,7 @@ export class CellSimulation {
       this.state.metrics.currentCycleTime = now - this.cycleStartedAt;
     }
 
+    this.state.robots.forEach((robot) => this.updateHardware(robot, now));
     this.state.timestamp = now;
     this.state.sequence += 1;
     return structuredClone(this.state);
@@ -194,7 +195,47 @@ export class CellSimulation {
   }
 
   private robot(id: 'arm-a' | 'arm-b', jointAngles: number[]): RobotState {
-    return { id, jointAngles: [...jointAngles], gripperClosed: false, status: 'idle' };
+    return {
+      id,
+      jointAngles: [...jointAngles],
+      gripperClosed: false,
+      status: 'idle',
+      hardware: this.baseHardware(id),
+    };
+  }
+
+  private baseHardware(id: 'arm-a' | 'arm-b'): RobotState['hardware'] {
+    return id === 'arm-a'
+      ? { tempC: 42, currentA: 3.2, voltageV: 48.0, pressureBar: 160 }
+      : { tempC: 40, currentA: 3.0, voltageV: 48.0, pressureBar: 155 };
+  }
+
+  private updateHardware(robot: RobotState, now: number): void {
+    const isActive = robot.status === 'moving' || robot.status === 'holding';
+    const base = this.baseHardware(robot.id);
+
+    if (!isActive) {
+      // Stopped/idle: values decay toward base, temperature cools slowly, no current/pressure fluctuation.
+      const prev = robot.hardware;
+      const targetTemp = base.tempC + 2;
+      robot.hardware = {
+        tempC: Math.round((prev.tempC + (targetTemp - prev.tempC) * 0.02) * 10) / 10,
+        currentA: base.currentA,
+        voltageV: base.voltageV,
+        pressureBar: base.pressureBar,
+      };
+      return;
+    }
+
+    // Active: realistic fluctuation around elevated baseline.
+    const seed = (now / 1000) + (robot.id === 'arm-a' ? 0 : 17);
+    const jitter = (s: number) => Math.sin(seed * s) * 0.5 + Math.cos(seed * s * 0.7) * 0.3;
+    robot.hardware = {
+      tempC: Math.round((base.tempC + 18 + jitter(1.3) * 3) * 10) / 10,
+      currentA: Math.round((base.currentA + 5.5 + jitter(2.1) * 0.8) * 10) / 10,
+      voltageV: Math.round((base.voltageV - Math.abs(jitter(0.9)) * 0.6) * 10) / 10,
+      pressureBar: Math.round((base.pressureBar + 48 + jitter(1.7) * 8) * 10) / 10,
+    };
   }
 
   private baseWorkpiece(): WorkpieceState {

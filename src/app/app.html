@@ -21,9 +21,15 @@
         <strong>{{ telemetry.latencyMs() !== null ? (telemetry.latencyMs()! | number:'1.0-0') + ' ms' : '— ms' }}</strong>
       </div>
       <div class="metric"><small>RENDER</small><strong>{{ fps() }} FPS</strong></div>
-      <div class="clock">{{ now() | date:'HH:mm:ss' }}<small>LOCAL</small></div>
+      <div class="clock"><small>LOCAL</small>{{ now() | date:'HH:mm:ss' }}</div>
     </div>
   </header>
+
+  <nav class="tab-bar">
+    <button class="tab-btn" [class.active]="activeTab() === 'operator'" (click)="activeTab.set('operator')">OPERATOR VIEW</button>
+    <button class="tab-btn" [class.active]="activeTab() === 'robot-data'" (click)="activeTab.set('robot-data')">ROBOT DATA</button>
+    <button class="tab-btn" [class.active]="activeTab() === 'history'" (click)="activeTab.set('history')">HISTORY</button>
+  </nav>
 
   @if (frame()?.activeAlert; as alert) {
     <div class="alert-banner" [class]="severityClass(alert.severity)">
@@ -36,6 +42,11 @@
     </div>
   }
 
+  @if (activeTab() === 'robot-data') {
+    <app-robot-data [frame]="frame()" />
+  }
+
+  @if (activeTab() === 'operator') {
   <main class="workspace">
     <aside class="panel control-panel">
       <section class="mission">
@@ -166,6 +177,7 @@
       </section>
     </aside>
   </main>
+  } <!-- /operator tab -->
 
   <footer>
     <span>SIMULATION MODE</span>

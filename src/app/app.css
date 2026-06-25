@@ -59,8 +59,8 @@ h1 { margin: 0; text-transform: uppercase; font: 600 18px/1 "Chakra Petch", sans
 .connection.offline .pulse { background: var(--red); box-shadow: 0 0 14px var(--red); }
 .metric.latency-warn strong { color: var(--amber); }
 .metric.latency-crit strong { color: var(--red); }
-.clock { padding: 16px 22px 0; border-left: 1px solid var(--line); color: var(--green); font: 600 17px/1 "IBM Plex Mono", monospace; min-width: 120px; }
-.clock small { margin-top: 6px; font-size: 9px; color: var(--muted); }
+.clock { padding: 16px 22px 0; border-left: 1px solid var(--line); color: var(--green); font: 600 17px/1 "IBM Plex Mono", monospace; min-width: 120px; display: flex; flex-direction: column; }
+.clock small { display: block; font-size: 9px; color: var(--muted); letter-spacing: 0.16em; margin-bottom: 6px; }
 
 /* ── ALERT BANNER ───────────────────────────────────────────── */
 .alert-banner {
@@ -76,6 +76,27 @@ h1 { margin: 0; text-transform: uppercase; font: 600 18px/1 "Chakra Petch", sans
   padding: 6px 14px; cursor: pointer; font: 700 9px "IBM Plex Mono"; transition: .2s;
 }
 .alert-banner button:hover { background: rgba(0,0,0,0.06); }
+
+/* ── TAB BAR ─────────────────────────────────────────────────── */
+.tab-bar {
+  display: flex;
+  border-bottom: 1px solid var(--line);
+  background: rgba(250, 253, 252, 0.98);
+}
+.tab-btn {
+  padding: 0 28px;
+  height: 72px;
+  font: 700 12px "IBM Plex Mono", monospace;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: color .2s, border-color .2s;
+}
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: var(--green); border-bottom-color: var(--green); }
 
 /* ── WORKSPACE LAYOUT ───────────────────────────────────────── */
 .workspace { min-height: 0; display: grid; grid-template-columns: 286px minmax(480px, 1fr) 312px; }

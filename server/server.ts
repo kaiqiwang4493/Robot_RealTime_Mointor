@@ -15,8 +15,27 @@ const port = Number(process.env['PORT'] ?? 8080);
 const publicDirectory = resolve(process.cwd(), 'dist/dual-arm-digital-twin/browser');
 
 app.disable('x-powered-by');
+app.use(express.json());
+
 app.get('/health', (_request, response) => {
   response.json({ status: 'ok', service: 'dual-arm-digital-twin', clients: sockets.size });
+});
+
+const MAINTENANCE_BASE: Record<string, { serviceHoursRemaining: number; lubricantPct: number }> = {
+  'arm-a': { serviceHoursRemaining: 342, lubricantPct: 78 },
+  'arm-b': { serviceHoursRemaining: 218, lubricantPct: 43 },
+};
+
+app.get('/api/robots/:id/maintenance', (request, response) => {
+  const { id } = request.params;
+  const base = MAINTENANCE_BASE[id];
+  if (!base) { response.status(404).json({ error: 'Unknown robot id' }); return; }
+  response.json({
+    robotId: id,
+    serviceHoursRemaining: Math.round((base.serviceHoursRemaining - Math.random() * 0.01) * 10) / 10,
+    lubricantPct: Math.round((base.lubricantPct - Math.random() * 0.05) * 10) / 10,
+    updatedAt: Date.now(),
+  });
 });
 
 if (existsSync(publicDirectory)) {

@@ -10,11 +10,19 @@ export type ProcessStep =
   | 'placing-completed'
   | 'cycle-complete';
 
+export interface RobotHardware {
+  tempC: number;
+  currentA: number;
+  voltageV: number;
+  pressureBar: number;
+}
+
 export interface RobotState {
   id: 'arm-a' | 'arm-b';
   jointAngles: number[];
   gripperClosed: boolean;
   status: 'idle' | 'moving' | 'holding' | 'faulted';
+  hardware: RobotHardware;
 }
 
 export interface WorkpieceState {
